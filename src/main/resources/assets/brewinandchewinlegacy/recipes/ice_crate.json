@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "pSp",
+    "sis",
+    "psp"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:string"
+    },
+    "i": {
+      "item": "minecraft:packed_ice"
+    },
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "slabWood"
+    }
+  },
+  "result": {
+    "item": "brewinandchewinlegacy:ice_crate",
+    "count": 1
+  }
+}

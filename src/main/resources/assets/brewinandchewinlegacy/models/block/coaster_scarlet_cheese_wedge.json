@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_cheese",
+  "textures": {
+    "cheese": "brewinandchewinlegacy:blocks/scarlet_cheese_wedge"
+  }
+}
+

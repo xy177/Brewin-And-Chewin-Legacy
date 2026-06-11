@@ -1,0 +1,8 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_tankard",
+  "textures": {
+    "particle": "brewinandchewinlegacy:blocks/bloody_mary",
+    "tankard": "brewinandchewinlegacy:blocks/bloody_mary"
+  }
+}
+

@@ -1,0 +1,18 @@
+{
+  "ingredients": [
+    "ore:bncCheeseWedge",
+    "ore:cropOnion",
+    "ore:listAllveggie",
+    "ore:foodBread"
+  ],
+  "cookingtime": 200,
+  "experience": 1.0,
+  "result": {
+    "item": "brewinandchewinlegacy:creamy_onion_soup",
+    "count": 1
+  },
+  "container": {
+    "item": "minecraft:bowl",
+    "count": 1
+  }
+}

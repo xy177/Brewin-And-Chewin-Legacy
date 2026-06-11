@@ -1,0 +1,8 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_tankard",
+  "textures": {
+    "particle": "brewinandchewinlegacy:blocks/dread_nog",
+    "tankard": "brewinandchewinlegacy:blocks/dread_nog"
+  }
+}
+

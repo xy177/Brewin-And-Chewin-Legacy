@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " f ",
+    "ptp",
+    "www"
+  ],
+  "key": {
+    "f": {
+      "type": "forge:ore_dict",
+      "ore": "bncCheeseWedge"
+    },
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "bncPizzaTopping"
+    },
+    "t": {
+      "item": "farmersdelight:tomato_sauce"
+    },
+    "w": {
+      "item": "minecraft:wheat"
+    }
+  },
+  "result": {
+    "item": "brewinandchewinlegacy:pizza",
+    "count": 1
+  }
+}

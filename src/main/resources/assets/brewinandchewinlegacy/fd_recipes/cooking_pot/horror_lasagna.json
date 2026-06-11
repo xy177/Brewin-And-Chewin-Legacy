@@ -1,0 +1,19 @@
+{
+  "ingredients": [
+    "brewinandchewinlegacy:scarlet_cheese_wedge",
+    "ore:cropBeetroot",
+    "farmersdelight:tomato_sauce",
+    "ore:foodPasta",
+    "ore:bncCheeseWedge"
+  ],
+  "cookingtime": 200,
+  "experience": 1.0,
+  "result": {
+    "item": "brewinandchewinlegacy:horror_lasagna",
+    "count": 1
+  },
+  "container": {
+    "item": "minecraft:bowl",
+    "count": 1
+  }
+}

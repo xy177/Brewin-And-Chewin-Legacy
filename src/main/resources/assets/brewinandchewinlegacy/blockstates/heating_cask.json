@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "brewinandchewinlegacy:heating_cask",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "brewinandchewinlegacy:heating_cask"
+    },
+    "facing=south": {
+      "model": "brewinandchewinlegacy:heating_cask",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "brewinandchewinlegacy:heating_cask",
+      "y": 270
+    }
+  }
+}

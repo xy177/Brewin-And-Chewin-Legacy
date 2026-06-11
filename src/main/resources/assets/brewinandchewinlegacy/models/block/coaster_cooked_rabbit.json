@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_rabbit",
+  "textures": {
+    "rabbit": "brewinandchewinlegacy:blocks/cooked_rabbit"
+  }
+}
+

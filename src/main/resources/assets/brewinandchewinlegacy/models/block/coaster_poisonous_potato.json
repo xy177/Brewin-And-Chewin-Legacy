@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_potato",
+  "textures": {
+    "potato": "brewinandchewinlegacy:blocks/poisonous_potato"
+  }
+}
+

@@ -1,0 +1,26 @@
+[
+  {
+    "modid": "brewinandchewinlegacy",
+    "name": "Brewin' And Chewin' Legacy",
+    "description": "A Minecraft 1.12.2 legacy port of Brewin' And Chewin', the cozy fermenting addon for Farmer's Delight. Brew drinks in kegs, age cheese wheels, serve snacks on coasters, and bring a bit of tavern charm to your Farmer's Delight kitchen.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://github.com/xy177/Brewin-And-Chewin-Legacy",
+    "updateJSON": "",
+    "authorList": ["xy177"],
+    "credits": "Original Brewin' And Chewin' by Probleyes, Umpaz, and MerchantCalico. Original project: https://github.com/ChefsDelights/BrewinAndChewin",
+    "logoFile": "art/logo.png",
+    "screenshots": [],
+    "dependencies": [
+      "required-after:farmersdelight",
+      "after:futuremc",
+      "after:da",
+      "after:oe",
+      "after:netherized",
+      "after:nb",
+      "after:deeperdepths",
+      "after:raids",
+      "after:teastory"
+    ]
+  }
+]

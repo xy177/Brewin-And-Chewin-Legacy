@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_porkchop",
+  "textures": {
+    "porkchop": "brewinandchewinlegacy:blocks/cooked_porkchop"
+  }
+}
+

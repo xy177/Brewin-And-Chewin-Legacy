@@ -1,0 +1,7 @@
+﻿{
+    "parent": "brewinandchewinlegacy:block/coaster_glass_mug",
+    "textures": {
+      "mug": "brewinandchewinlegacy:blocks/hot_cocoa"
+    }
+}
+

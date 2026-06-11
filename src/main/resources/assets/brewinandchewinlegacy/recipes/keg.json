@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ipi",
+    "ihi",
+    "ppp"
+  ],
+  "key": {
+    "h": {
+      "type": "forge:ore_dict",
+      "ore": "bncBeeswax"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
+    }
+  },
+  "result": {
+    "item": "brewinandchewinlegacy:keg",
+    "count": 1
+  }
+}

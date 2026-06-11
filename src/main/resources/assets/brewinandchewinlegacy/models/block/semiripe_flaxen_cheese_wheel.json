@@ -1,0 +1,9 @@
+﻿{
+	"parent": "brewinandchewinlegacy:block/cheese_wheel_template",
+	"textures": {
+		"top": "brewinandchewinlegacy:blocks/semiripe_flaxen_cheese_wheel_top",
+		"side": "brewinandchewinlegacy:blocks/semiripe_flaxen_cheese_wheel_side",
+		"bottom": "brewinandchewinlegacy:blocks/semiripe_flaxen_cheese_wheel_bottom",
+		"particle": "brewinandchewinlegacy:blocks/semiripe_flaxen_cheese_wheel_top"
+	}
+}

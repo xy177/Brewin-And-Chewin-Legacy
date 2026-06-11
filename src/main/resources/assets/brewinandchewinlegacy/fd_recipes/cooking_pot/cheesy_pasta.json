@@ -1,0 +1,18 @@
+{
+  "ingredients": [
+    "brewinandchewinlegacy:flaxen_cheese_wedge",
+    "ore:foodPasta",
+    "ore:cropTomato",
+    "ore:listAllfishraw"
+  ],
+  "cookingtime": 200,
+  "experience": 1.0,
+  "result": {
+    "item": "brewinandchewinlegacy:cheesy_pasta",
+    "count": 1
+  },
+  "container": {
+    "item": "minecraft:bowl",
+    "count": 1
+  }
+}

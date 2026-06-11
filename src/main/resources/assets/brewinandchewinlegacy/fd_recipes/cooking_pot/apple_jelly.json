@@ -1,0 +1,18 @@
+{
+  "ingredients": [
+    "minecraft:apple",
+    "minecraft:apple",
+    "minecraft:apple",
+    "minecraft:sugar"
+  ],
+  "cookingtime": 200,
+  "experience": 1.0,
+  "result": {
+    "item": "brewinandchewinlegacy:apple_jelly",
+    "count": 1
+  },
+  "container": {
+    "item": "minecraft:glass_bottle",
+    "count": 1
+  }
+}

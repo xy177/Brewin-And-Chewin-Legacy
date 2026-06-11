@@ -1,0 +1,19 @@
+{
+  "ingredients": [
+    "ore:bncCheeseWedge",
+    "ore:listAllEgg",
+    "ore:listAllEgg",
+    "ore:cropOnion",
+    "ore:cropCarrot"
+  ],
+  "cookingtime": 200,
+  "experience": 1.0,
+  "result": {
+    "item": "brewinandchewinlegacy:vegetable_omelet",
+    "count": 1
+  },
+  "container": {
+    "item": "minecraft:bowl",
+    "count": 1
+  }
+}

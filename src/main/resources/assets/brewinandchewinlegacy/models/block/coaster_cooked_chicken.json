@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_chicken",
+  "textures": {
+    "chicken": "brewinandchewinlegacy:blocks/cooked_chicken"
+  }
+}
+

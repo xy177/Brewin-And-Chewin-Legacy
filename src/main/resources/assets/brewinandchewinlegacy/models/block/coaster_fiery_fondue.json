@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_bowl_full",
+  "textures": {
+    "bowl": "brewinandchewinlegacy:blocks/fiery_fondue"
+  }
+}
+

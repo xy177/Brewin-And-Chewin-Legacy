@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "brewinandchewinlegacy:blocks/heating_cask_front",
+    "down": "farmersdelight:block/crate_bottom",
+    "up": "brewinandchewinlegacy:blocks/heating_cask_top",
+    "north": "brewinandchewinlegacy:blocks/heating_cask_front",
+    "east": "brewinandchewinlegacy:blocks/heating_cask_side",
+    "south": "brewinandchewinlegacy:blocks/heating_cask_side",
+    "west": "brewinandchewinlegacy:blocks/heating_cask_side"
+  }
+}

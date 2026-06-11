@@ -1,0 +1,14 @@
+{
+  "variants": {
+    "invisible=false,size=0": { "model": "brewinandchewinlegacy:coaster" },
+    "invisible=false,size=1": { "model": "brewinandchewinlegacy:coaster" },
+    "invisible=false,size=2": { "model": "brewinandchewinlegacy:coaster_tray" },
+    "invisible=false,size=3": { "model": "brewinandchewinlegacy:coaster_tray" },
+    "invisible=false,size=4": { "model": "brewinandchewinlegacy:coaster_tray" },
+    "invisible=true,size=0": { "model": "brewinandchewinlegacy:coaster_invisible" },
+    "invisible=true,size=1": { "model": "brewinandchewinlegacy:coaster_invisible" },
+    "invisible=true,size=2": { "model": "brewinandchewinlegacy:coaster_invisible" },
+    "invisible=true,size=3": { "model": "brewinandchewinlegacy:coaster_invisible" },
+    "invisible=true,size=4": { "model": "brewinandchewinlegacy:coaster_invisible" }
+  }
+}

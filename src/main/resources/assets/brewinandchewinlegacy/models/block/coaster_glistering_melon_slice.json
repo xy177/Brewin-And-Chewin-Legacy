@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_gourd_slice",
+  "textures": {
+    "gourd": "brewinandchewinlegacy:blocks/glistering_melon_slice"
+  }
+}
+

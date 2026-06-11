@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "pp",
+    "pp"
+  ],
+  "key": {
+    "p": {
+      "item": "brewinandchewinlegacy:flaxen_cheese_wedge"
+    }
+  },
+  "result": {
+    "item": "brewinandchewinlegacy:flaxen_cheese_wheel",
+    "count": 1
+  }
+}

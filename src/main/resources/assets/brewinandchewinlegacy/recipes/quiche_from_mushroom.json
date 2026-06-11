@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "blb",
+    "mcm",
+    "eCe"
+  ],
+  "key": {
+    "C": {
+      "item": "farmersdelight:pie_crust"
+    },
+    "b": {
+      "item": "minecraft:brown_mushroom"
+    },
+    "c": {
+      "type": "forge:ore_dict",
+      "ore": "bncCheeseWedge"
+    },
+    "e": {
+      "item": "minecraft:egg"
+    },
+    "l": {
+      "item": "farmersdelight:cabbage_leaf"
+    },
+    "m": {
+      "type": "forge:ore_dict",
+      "ore": "bncMilkFood"
+    }
+  },
+  "result": {
+    "item": "brewinandchewinlegacy:quiche",
+    "count": 1
+  }
+}

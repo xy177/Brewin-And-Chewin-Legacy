@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_beef",
+  "textures": {
+    "beef": "brewinandchewinlegacy:blocks/cooked_beef"
+  }
+}
+

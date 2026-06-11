@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "brewinandchewinlegacy:unripe_scarlet_cheese_wheel"
+    },
+    "age=1": {
+      "model": "brewinandchewinlegacy:semiripe_scarlet_cheese_wheel"
+    }
+  }
+}

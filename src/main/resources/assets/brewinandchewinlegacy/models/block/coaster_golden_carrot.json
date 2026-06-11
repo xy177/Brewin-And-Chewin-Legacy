@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_carrot",
+  "textures": {
+    "carrot": "brewinandchewinlegacy:blocks/golden_carrot"
+  }
+}
+

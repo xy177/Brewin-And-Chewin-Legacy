@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "sss",
+    "cCc",
+    "pmp"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:blaze_powder"
+    },
+    "c": {
+      "item": "minecraft:coal_block"
+    },
+    "m": {
+      "item": "minecraft:magma"
+    },
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "slabWood"
+    }
+  },
+  "result": {
+    "item": "brewinandchewinlegacy:heating_cask",
+    "count": 1
+  }
+}

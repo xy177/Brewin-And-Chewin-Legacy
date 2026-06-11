@@ -1,0 +1,19 @@
+{
+  "ingredients": [
+    "brewinandchewinlegacy:scarlet_cheese_wedge",
+    "ore:cropPotato",
+    "ore:foodDough",
+    "minecraft:nether_wart",
+    "ore:cropCabbage"
+  ],
+  "cookingtime": 200,
+  "experience": 1.0,
+  "result": {
+    "item": "brewinandchewinlegacy:scarlet_pierogi",
+    "count": 1
+  },
+  "container": {
+    "item": "minecraft:bowl",
+    "count": 1
+  }
+}

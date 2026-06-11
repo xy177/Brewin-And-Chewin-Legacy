@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_apple",
+  "textures": {
+    "apple": "brewinandchewinlegacy:blocks/golden_apple"
+  }
+}
+

@@ -1,0 +1,7 @@
+﻿{
+  "parent": "brewinandchewinlegacy:block/coaster_flat",
+  "textures": {
+    "flat": "brewinandchewinlegacy:blocks/sweet_berries"
+  }
+}
+

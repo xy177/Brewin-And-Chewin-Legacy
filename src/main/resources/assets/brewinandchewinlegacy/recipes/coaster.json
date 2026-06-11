@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ww"
+  ],
+  "key": {
+    "w": {
+      "item": "farmersdelight:canvas"
+    }
+  },
+  "result": {
+    "item": "brewinandchewinlegacy:coaster",
+    "count": 4
+  }
+}
