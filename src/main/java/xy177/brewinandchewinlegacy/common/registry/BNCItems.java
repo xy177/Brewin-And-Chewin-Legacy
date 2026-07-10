@@ -161,7 +161,7 @@ public final class BNCItems {
         KIPPERS = register("kippers", food(6, 0.5F));
         COCOA_FUDGE = register("cocoa_fudge", food(4, 0.8F).addEffect(effect("minecraft", "speed"), 800, 0, 1.0F));
         SWEET_BERRIES = Loader.isModLoaded("futuremc") ? null : register("sweet_berries", food(2, 0.1F));
-        GLOW_BERRIES = Loader.isModLoaded("da") ? null : register("glow_berries", food(2, 0.1F).addEffect(effect("minecraft", "night_vision"), 200, 0, 1.0F));
+        GLOW_BERRIES = hasExternalGlowBerries() ? null : register("glow_berries", food(2, 0.1F).addEffect(effect("minecraft", "night_vision"), 200, 0, 1.0F));
         SWEET_BERRY_JAM = register("sweet_berry_jam", bottleFood(6, 0.4F));
         GLOW_BERRY_MARMALADE = register("glow_berry_marmalade", bottleFood(6, 0.4F));
         APPLE_JELLY = register("apple_jelly", bottleFood(10, 0.6F));
@@ -229,6 +229,10 @@ public final class BNCItems {
 
     private static boolean hasExternalFungus(String path) {
         return hasRegisteredItem("futuremc", path) || hasRegisteredItem("netherized", path) || hasRegisteredItem("nb", path);
+    }
+
+    private static boolean hasExternalGlowBerries() {
+        return hasRegisteredItem("da", "glow_berry") || hasRegisteredItem("depthsupdate", "glow_berries");
     }
 
     private static boolean hasExternalOceanItem(String path) {

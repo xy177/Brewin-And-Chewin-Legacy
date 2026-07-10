@@ -16,7 +16,9 @@ It brings the cozy little tavern side of Farmer's Delight back to 1.12.2: fermen
 
 - Future MC: Uses its sweet berries, honey bottles, honeycombs, wither roses, and some modern Nether or aquatic ingredients when available. If it is not installed, this mod enables local fallback items and recipes where needed.
 
-- Unseen's Dungeon Additions: Uses its glow berries when available. If it is not installed, this mod registers local glow berries with an alternate acquisition path.
+- Unseen's Dungeon Additions: Provides the preferred glow berries for recipes when available.
+
+- Depths Update: Uses its glow berries when Unseen's Dungeon Additions is not providing them. If neither mod provides glow berries, this mod registers local glow berries with an alternate acquisition path.
 
 - Oceanic Expanse: Uses its kelp, dried kelp, sea pickles, seagrass, glow ink sacs, turtle eggs, and other aquatic ingredients when available. If it is not installed, this mod enables local fallback items, fishing drops, and villager trade sources.
 
@@ -35,4 +37,3 @@ It brings the cozy little tavern side of Farmer's Delight back to 1.12.2: fermen
 - Original mod on CurseForge: https://www.curseforge.com/minecraft/mc-mods/brewin-and-chewin
 
 - Original mod on GitHub: https://github.com/ChefsDelights/BrewinAndChewin
-

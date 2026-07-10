@@ -23,12 +23,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import xy177.brewinandchewinlegacy.BrewinAndChewinLegacy;
+import xy177.brewinandchewinlegacy.client.compat.BNCAppleSkinCompat;
 import xy177.brewinandchewinlegacy.common.network.BNCClientEffectState;
 import xy177.brewinandchewinlegacy.common.registry.BNCEffects;
 
@@ -38,6 +41,7 @@ public final class BNCClientEffectEvents extends Gui {
     private static final ResourceLocation FOOD_EMPTY_INTOXICATION = new ResourceLocation(BrewinAndChewinLegacy.MODID, "textures/gui/hud/food_empty_intoxication.png");
     private static final ResourceLocation FOOD_FULL_INTOXICATION = new ResourceLocation(BrewinAndChewinLegacy.MODID, "textures/gui/hud/food_full_intoxication.png");
     private static final ResourceLocation FOOD_HALF_INTOXICATION = new ResourceLocation(BrewinAndChewinLegacy.MODID, "textures/gui/hud/food_half_intoxication.png");
+    private static final ResourceLocation NOURISHMENT_ICONS = new ResourceLocation("farmersdelight", "textures/gui/fd_icons.png");
     private static final Random RANDOM = new Random();
     private static final BNCClientEffectEvents HUD = new BNCClientEffectEvents();
     private static final Map<BlockPos, ITextComponent[]> ORIGINAL_SIGN_TEXT = new HashMap<>();
@@ -60,6 +64,7 @@ public final class BNCClientEffectEvents extends Gui {
         }
 
         BNCClientEffectState.clientTick();
+        BNCAppleSkinCompat.clientTick();
         applyPendingTipsyEffect(player);
         spawnEffectParticles(player);
         updateNearbySigns(mc.world, player);
@@ -121,17 +126,19 @@ public final class BNCClientEffectEvents extends Gui {
         renderTipsyHearts(mc, event.getResolution(), tipsyDamage);
     }
 
-    @SubscribeEvent
-    public static void onRenderFood(RenderGameOverlayEvent.Post event) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onRenderFood(RenderGameOverlayEvent.Pre event) {
         if (event.getType() != RenderGameOverlayEvent.ElementType.FOOD) {
             return;
         }
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
-        if (player == null || !player.isPotionActive(BNCEffects.INTOXICATION)) {
+        if (event.isCanceled() || player == null || !player.isPotionActive(BNCEffects.INTOXICATION)) {
             return;
         }
-        renderIntoxicationFoodOverlay(mc, event.getResolution());
+        renderIntoxicationFoodOverlay(mc, event.getResolution(), event.getPartialTicks());
+        GuiIngameForge.right_height += 10;
+        event.setCanceled(true);
     }
 
     @SubscribeEvent
@@ -247,26 +254,64 @@ public final class BNCClientEffectEvents extends Gui {
         return builder.toString();
     }
 
-    private static void renderIntoxicationFoodOverlay(Minecraft mc, ScaledResolution resolution) {
+    private static void renderIntoxicationFoodOverlay(Minecraft mc, ScaledResolution resolution, float partialTicks) {
         int food = mc.player.getFoodStats().getFoodLevel();
         int left = resolution.getScaledWidth() / 2 + 91;
-        int top = resolution.getScaledHeight() - 39;
+        int top = resolution.getScaledHeight() - GuiIngameForge.right_height;
+        float ticks = mc.ingameGUI.getUpdateCounter() + partialTicks;
+        Random random = new Random((long) mc.ingameGUI.getUpdateCounter() * 312871L);
+        boolean shake = mc.player.getFoodStats().getSaturationLevel() <= 0.0F
+            && mc.ingameGUI.getUpdateCounter() % (food * 3 + 1) == 0;
+        boolean nourishment = mc.player.isPotionActive(com.wdcftgg.farmersdelightlegacy.common.registry.ModEffects.NOURISHMENT);
+        boolean healing = nourishment
+            && mc.player.world.getGameRules().getBoolean("naturalRegeneration")
+            && mc.player.shouldHeal()
+            && food >= 18;
+        int[] iconX = new int[10];
+        int[] iconY = new int[10];
+
+        BNCAppleSkinCompat.renderExhaustionUnderlay(mc, left, top);
         GlStateManager.enableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         for (int i = 0; i < 10; i++) {
-            int x = left - i * 8 - 9;
-            int y = top;
-            ResourceLocation texture = FOOD_EMPTY_INTOXICATION;
-            int value = i * 2 + 1;
-            if (value < food) {
-                texture = FOOD_FULL_INTOXICATION;
-            } else if (value == food) {
-                texture = FOOD_HALF_INTOXICATION;
+            int x = left - i * 8 - 9 + (int) (Math.cos((ticks + i * 2) * 0.20F) * 2.0F);
+            int y = top + (int) (Math.sin((ticks + i * 2) * 0.25F) * 2.0F);
+            if (shake) {
+                y += random.nextInt(3) - 1;
             }
-            mc.getTextureManager().bindTexture(texture);
-            Gui.drawModalRectWithCustomSizedTexture(x, y, 0.0F, 0.0F, 9, 9, 9.0F, 9.0F);
+            iconX[i] = x;
+            iconY[i] = y;
+
+            float hunger = food / 2.0F - i;
+            if (nourishment) {
+                renderNourishmentFoodIcon(mc, x, y, hunger, healing);
+            } else {
+                renderIntoxicationFoodIcon(mc, x, y, hunger);
+            }
         }
+        BNCAppleSkinCompat.renderFoodOverlays(mc, iconX, iconY);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableBlend();
+    }
+
+    private static void renderIntoxicationFoodIcon(Minecraft mc, int x, int y, float hunger) {
+        mc.getTextureManager().bindTexture(FOOD_EMPTY_INTOXICATION);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0.0F, 0.0F, 9, 9, 9.0F, 9.0F);
+        if (hunger < 0.5F) {
+            return;
+        }
+        mc.getTextureManager().bindTexture(hunger >= 1.0F ? FOOD_FULL_INTOXICATION : FOOD_HALF_INTOXICATION);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0.0F, 0.0F, 9, 9, 9.0F, 9.0F);
+    }
+
+    private static void renderNourishmentFoodIcon(Minecraft mc, int x, int y, float hunger, boolean healing) {
+        mc.getTextureManager().bindTexture(NOURISHMENT_ICONS);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0.0F, 0.0F, 9, 9, 256.0F, 256.0F);
+        if (hunger >= 1.0F) {
+            Gui.drawModalRectWithCustomSizedTexture(x, y, healing ? 36.0F : 18.0F, 0.0F, 9, 9, 256.0F, 256.0F);
+        } else if (hunger >= 0.5F) {
+            Gui.drawModalRectWithCustomSizedTexture(x, y, healing ? 27.0F : 9.0F, 0.0F, 9, 9, 256.0F, 256.0F);
+        }
     }
 
     private static void renderTipsyHearts(Minecraft mc, ScaledResolution resolution, float tipsyDamage) {

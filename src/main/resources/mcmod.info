@@ -15,6 +15,7 @@
       "required-after:farmersdelight",
       "after:futuremc",
       "after:da",
+      "after:depthsupdate",
       "after:oe",
       "after:netherized",
       "after:nb",

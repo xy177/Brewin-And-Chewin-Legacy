@@ -36,13 +36,13 @@ import xy177.brewinandchewinlegacy.common.tile.BNCKegTileEntity;
     modid = BrewinAndChewinLegacy.MODID,
     name = BrewinAndChewinLegacy.NAME,
     version = BrewinAndChewinLegacy.VERSION,
-    dependencies = "required-after:farmersdelight;after:futuremc;after:da;after:oe;after:netherized;after:nb;after:deeperdepths;after:raids;after:teastory"
+    dependencies = "required-after:farmersdelight;after:futuremc;after:da;after:depthsupdate;after:oe;after:netherized;after:nb;after:deeperdepths;after:raids;after:teastory"
 )
 @Mod.EventBusSubscriber(modid = BrewinAndChewinLegacy.MODID)
 public class BrewinAndChewinLegacy {
     public static final String MODID = "brewinandchewinlegacy";
     public static final String NAME = "Brewin' And Chewin' Legacy";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.0.1";
     public static final CreativeTabs CREATIVE_TAB = BNCCreativeTab.INSTANCE;
 
     @Mod.Instance(MODID)

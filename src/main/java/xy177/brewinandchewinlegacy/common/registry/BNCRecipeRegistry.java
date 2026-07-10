@@ -32,6 +32,7 @@ public final class BNCRecipeRegistry {
         registerGlowInkSacCookingPotRecipe();
         registerHoneyFallbackCookingPotRecipes();
         registerDriedKelpSmelting();
+        registerFeastCuttingBoardRecipes();
         registerWitherRoseCuttingBoardRecipe();
         BNCKegFermentingRegistry.registerDefaults();
     }
@@ -124,6 +125,25 @@ public final class BNCRecipeRegistry {
         }
     }
 
+    private static void registerFeastCuttingBoardRecipes() {
+        registerCuttingBoardRecipe("flaxen_cheese_wheel", BNCBlocks.FLAXEN_CHEESE_WHEEL_ITEM, BNCItems.FLAXEN_CHEESE_WEDGE);
+        registerCuttingBoardRecipe("scarlet_cheese_wheel", BNCBlocks.SCARLET_CHEESE_WHEEL_ITEM, BNCItems.SCARLET_CHEESE_WEDGE);
+        registerCuttingBoardRecipe("quiche", BNCBlocks.QUICHE_ITEM, BNCItems.QUICHE_SLICE);
+        registerCuttingBoardRecipe("pizza", BNCBlocks.PIZZA_ITEM, BNCItems.PIZZA_SLICE);
+    }
+
+    private static void registerCuttingBoardRecipe(String path, Item input, Item result) {
+        if (!CuttingBoardRecipeApi.registerRecipe(
+            id(path),
+            new ItemStack(input),
+            null,
+            new ItemStack(result, 4),
+            1.0F
+        )) {
+            BrewinAndChewinLegacy.getLogger().warn("Failed to register cutting board recipe {}.", id(path));
+        }
+    }
+
     private static void registerWitherRoseCuttingBoardRecipe() {
         if (BNCItems.WITHER_ROSE == null) {
             return;
@@ -143,7 +163,7 @@ public final class BNCRecipeRegistry {
         BrewinAndChewinLegacy.getLogger().info("Using {} for sweet berry recipes.", itemName(BNCOreDictionary.getSweetBerriesItem()));
         BrewinAndChewinLegacy.getLogger().info("Using {} for glow berry recipes.", itemName(BNCOreDictionary.getGlowBerriesItem()));
         if (!BNCOreDictionary.hasExternalGlowBerries()) {
-            BrewinAndChewinLegacy.getLogger().info("UDA glow berry is absent; local glow berries cooking-pot fallback is enabled.");
+            BrewinAndChewinLegacy.getLogger().info("No compatible external glow berries are available; local glow berries cooking-pot fallback is enabled.");
         }
     }
 

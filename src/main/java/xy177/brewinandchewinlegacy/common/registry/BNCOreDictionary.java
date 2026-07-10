@@ -124,7 +124,7 @@ public final class BNCOreDictionary {
         berryCompatibilityRegistered = true;
 
         registerPreferredOre("bncSweetBerries", BNCItems.SWEET_BERRIES, "futuremc:sweet_berries");
-        registerPreferredOre("bncGlowBerries", BNCItems.GLOW_BERRIES, "da:glow_berry");
+        registerPreferredOre("bncGlowBerries", BNCItems.GLOW_BERRIES, "da:glow_berry", "depthsupdate:glow_berries");
     }
 
     public static Item getSweetBerriesItem() {
@@ -133,12 +133,12 @@ public final class BNCOreDictionary {
     }
 
     public static Item getGlowBerriesItem() {
-        Item preferred = findItem("da:glow_berry");
+        Item preferred = findFirstItem("da:glow_berry", "depthsupdate:glow_berries");
         return preferred == null ? BNCItems.GLOW_BERRIES : preferred;
     }
 
     public static boolean hasExternalGlowBerries() {
-        return findItem("da:glow_berry") != null;
+        return findFirstItem("da:glow_berry", "depthsupdate:glow_berries") != null;
     }
 
     public static Item getKelpItem() {
@@ -175,12 +175,22 @@ public final class BNCOreDictionary {
         }
     }
 
-    private static void registerPreferredOre(String oreName, Item fallback, String preferredId) {
-        Item preferred = findItem(preferredId);
+    private static void registerPreferredOre(String oreName, Item fallback, String... preferredIds) {
+        Item preferred = findFirstItem(preferredIds);
         Item item = preferred == null ? fallback : preferred;
         if (item != null) {
             OreDictionary.registerOre(oreName, item);
         }
+    }
+
+    private static Item findFirstItem(String... ids) {
+        for (String id : ids) {
+            Item item = findItem(id);
+            if (item != null) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private static void registerOptionalOre(String oreName, String preferredId, ItemStack fallback) {
