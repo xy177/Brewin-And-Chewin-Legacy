@@ -6,6 +6,8 @@ import java.util.List;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
+import mezz.jei.api.IJeiRuntime;
+import mezz.jei.api.IRecipeRegistry;
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.IRecipeCategory;
@@ -22,6 +24,9 @@ import xy177.brewinandchewinlegacy.common.registry.BNCItems;
 
 @JEIPlugin
 public class BNCJeiPlugin implements IModPlugin {
+    private static final List<BNCKegFermentingJeiRecipe> ACTIVE_FERMENTING_RECIPES = new ArrayList<>();
+    private static IJeiRuntime jeiRuntime;
+
     @Override
     public void registerCategories(IRecipeCategoryRegistration registry) {
         registry.addRecipeCategories(
@@ -33,7 +38,9 @@ public class BNCJeiPlugin implements IModPlugin {
     @Override
     public void register(IModRegistry registry) {
         BNCKegFermentingRegistry.registerDefaults();
-        registry.addRecipes(createFermentingRecipes(), BNCJeiRecipeTypes.FERMENTING);
+        ACTIVE_FERMENTING_RECIPES.clear();
+        ACTIVE_FERMENTING_RECIPES.addAll(createFermentingRecipes());
+        registry.addRecipes(new ArrayList<>(ACTIVE_FERMENTING_RECIPES), BNCJeiRecipeTypes.FERMENTING);
         registry.addRecipes(createCheeseAgingRecipes(), BNCJeiRecipeTypes.CHEESE_AGING);
         registry.addRecipeCatalyst(new ItemStack(BNCBlocks.KEG_ITEM), BNCJeiRecipeTypes.FERMENTING);
         registry.addRecipeClickArea(BNCKegGui.class, 80, 25, 23, 18, BNCJeiRecipeTypes.FERMENTING);
@@ -41,15 +48,37 @@ public class BNCJeiPlugin implements IModPlugin {
         registry.addRecipeRegistryPlugin(new PriorityPlugin());
     }
 
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime runtime) {
+        jeiRuntime = runtime;
+        BNCKegFermentingRegistry.addChangeListener(BNCJeiPlugin::refreshFermentingRecipes);
+        refreshFermentingRecipes();
+    }
+
     private static List<BNCKegFermentingJeiRecipe> createFermentingRecipes() {
         List<BNCKegFermentingJeiRecipe> recipes = new ArrayList<>();
         for (BNCKegFermentingRecipe recipe : BNCKegFermentingRegistry.getRecipes()) {
             BNCKegFermentingJeiRecipe jeiRecipe = new BNCKegFermentingJeiRecipe(recipe);
-            if (!jeiRecipe.getOutput().isEmpty()) {
+            if (!jeiRecipe.getOutput().isEmpty() || jeiRecipe.getOutputFluidStack() != null) {
                 recipes.add(jeiRecipe);
             }
         }
         return recipes;
+    }
+
+    private static void refreshFermentingRecipes() {
+        if (jeiRuntime == null) {
+            return;
+        }
+        IRecipeRegistry recipeRegistry = jeiRuntime.getRecipeRegistry();
+        for (BNCKegFermentingJeiRecipe recipe : ACTIVE_FERMENTING_RECIPES) {
+            recipeRegistry.removeRecipe(recipe, BNCJeiRecipeTypes.FERMENTING);
+        }
+        ACTIVE_FERMENTING_RECIPES.clear();
+        ACTIVE_FERMENTING_RECIPES.addAll(createFermentingRecipes());
+        for (BNCKegFermentingJeiRecipe recipe : ACTIVE_FERMENTING_RECIPES) {
+            recipeRegistry.addRecipe(recipe, BNCJeiRecipeTypes.FERMENTING);
+        }
     }
 
     private static List<BNCCheeseAgingJeiRecipe> createCheeseAgingRecipes() {

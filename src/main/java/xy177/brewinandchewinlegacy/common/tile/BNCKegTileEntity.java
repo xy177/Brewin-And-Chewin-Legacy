@@ -14,6 +14,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -22,14 +23,23 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.FluidTankProperties;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFluid;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFermentingRecipe;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFermentingRegistry;
 import xy177.brewinandchewinlegacy.common.registry.BNCBlocks;
+import xy177.brewinandchewinlegacy.common.registry.BNCFluids;
 import xy177.brewinandchewinlegacy.common.registry.BNCItems;
 
-public class BNCKegTileEntity extends TileEntity implements IInventory, net.minecraft.util.ITickable {
+public class BNCKegTileEntity extends TileEntity implements IInventory, net.minecraft.util.ITickable, IFluidHandler {
     private static final int SLOT_COUNT = 6;
     private static final int RANGE = 2;
 
@@ -86,6 +96,73 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
 
     public int getTemperature() {
         return temperature;
+    }
+
+    @Override
+    public IFluidTankProperties[] getTankProperties() {
+        return new IFluidTankProperties[] {
+            new FluidTankProperties(BNCFluids.stackFor(fluidId, fluidAmount), BNCKegFluid.CAPACITY)
+        };
+    }
+
+    @Override
+    public int fill(FluidStack resource, boolean doFill) {
+        if (resource == null || resource.getFluid() == null || resource.amount <= 0) {
+            return 0;
+        }
+        String incomingFluid = BNCFluids.idFor(resource.getFluid());
+        int accepted = Math.min(resource.amount, BNCKegFluid.CAPACITY - fluidAmount);
+        if (incomingFluid.isEmpty() || accepted <= 0 || fluidAmount > 0 && !incomingFluid.equals(fluidId)) {
+            return 0;
+        }
+        if (doFill) {
+            if (fluidAmount == 0) {
+                fluidId = incomingFluid;
+            }
+            fluidAmount += accepted;
+            syncToClient();
+        }
+        return accepted;
+    }
+
+    @Override
+    public FluidStack drain(FluidStack resource, boolean doDrain) {
+        if (resource == null || resource.getFluid() == null
+            || !BNCFluids.idFor(resource.getFluid()).equals(fluidId)) {
+            return null;
+        }
+        return drain(resource.amount, doDrain);
+    }
+
+    @Override
+    public FluidStack drain(int maxDrain, boolean doDrain) {
+        if (maxDrain <= 0 || fluidAmount <= 0) {
+            return null;
+        }
+        FluidStack drained = BNCFluids.stackFor(fluidId, Math.min(maxDrain, fluidAmount));
+        if (drained == null) {
+            return null;
+        }
+        if (doDrain) {
+            fluidAmount -= drained.amount;
+            normalizeFluid();
+            syncToClient();
+        }
+        return drained;
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this);
+        }
+        return super.getCapability(capability, facing);
     }
 
     public String getTemperatureName() {
@@ -274,7 +351,7 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
             case 3:
                 return fluidAmount;
             case 4:
-                return BNCKegFluid.toCode(fluidId);
+                return BNCFluids.networkCodeFor(fluidId);
             default:
                 return 0;
         }
@@ -293,12 +370,13 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
                 temperature = value;
                 break;
             case 3:
-                fluidAmount = value;
-                normalizeFluid();
+                fluidAmount = Math.max(0, Math.min(BNCKegFluid.CAPACITY, value));
+                if (fluidAmount == 0) {
+                    fluidId = BNCKegFluid.EMPTY;
+                }
                 break;
             case 4:
-                fluidId = BNCKegFluid.fromCode(value);
-                normalizeFluid();
+                fluidId = BNCFluids.idFromNetworkCode(value);
                 break;
             default:
                 break;
@@ -317,8 +395,8 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
     }
 
     private void updateFermenting() {
-        BNCKegFermentingRecipe recipe = BNCKegFermentingRegistry.findMatch(getInputStacks());
-        if (recipe == null || !recipe.canOutputTo(inventory.get(5)) || !canUseFluidFor(recipe)) {
+        BNCKegFermentingRecipe recipe = BNCKegFermentingRegistry.findMatch(getInputStacks(), fluidId, fluidAmount);
+        if (recipe == null || !recipe.canOutputTo(inventory.get(5))) {
             coolDownProgress();
             return;
         }
@@ -464,15 +542,6 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
         return true;
     }
 
-    private boolean canUseFluidFor(BNCKegFermentingRecipe recipe) {
-        if (!recipe.requiresFluid()) {
-            return fluidAmount <= 0;
-        }
-        return recipe.getBaseFluid().equals(fluidId)
-            && fluidAmount >= recipe.getBaseFluidAmount()
-            && fluidAmount % recipe.getBaseFluidAmount() == 0;
-    }
-
     private boolean canAcceptFluid(String incomingFluidId, int incomingAmount) {
         return incomingAmount > 0
             && (fluidAmount <= 0 || incomingFluidId.equals(fluidId))
@@ -536,10 +605,15 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
                 return new ContainerFluid(BNCKegFluid.GREEN_TEA, 250, new ItemStack(cup, 1, stack.getMetadata()));
             }
         }
-        return null;
+        return getGenericContainerFill(stack);
     }
 
     private ContainerFluid getContainerExtraction(ItemStack stack) {
+        BNCKegFermentingRecipe customPouring = BNCKegFermentingRegistry.findCustomPouringRecipe(
+            fluidId, stack, fluidAmount);
+        if (customPouring != null) {
+            return new ContainerFluid(fluidId, customPouring.getPouringAmount(), customPouring.getPouringResult());
+        }
         if (stack.getItem() == Items.GLASS_BOTTLE) {
             if (BNCKegFluid.MILK.equals(fluidId) && hasItem("farmersdelight:milk_bottle")) {
                 return new ContainerFluid(BNCKegFluid.MILK, 250, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("farmersdelight:milk_bottle"))));
@@ -565,14 +639,65 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
                 return new ContainerFluid(fluidId, 250, drink);
             }
         }
-        return null;
+        return getGenericContainerExtraction(stack);
     }
 
     private boolean isExtractionContainer(ItemStack stack) {
+        if (BNCKegFermentingRegistry.findCustomPouringRecipe(fluidId, stack, BNCKegFluid.CAPACITY) != null) {
+            return true;
+        }
         return isItem(stack, "futuremc:honeycomb")
             || BNCItems.SYNTHETIC_BEESWAX != null && stack.getItem() == BNCItems.SYNTHETIC_BEESWAX
             || stack.getItem() == BNCItems.TANKARD && BNCKegFluid.isDrink(fluidId)
-            || stack.getItem() == Items.GLASS_BOTTLE && (BNCKegFluid.MILK.equals(fluidId) || BNCKegFluid.HONEY.equals(fluidId) && (hasItem("futuremc:honey_bottle") || BNCItems.ADULTERATED_HONEY != null));
+            || stack.getItem() == Items.GLASS_BOTTLE && (BNCKegFluid.MILK.equals(fluidId) || BNCKegFluid.HONEY.equals(fluidId) && (hasItem("futuremc:honey_bottle") || BNCItems.ADULTERATED_HONEY != null))
+            || getGenericContainerExtraction(stack) != null;
+    }
+
+    private ContainerFluid getGenericContainerFill(ItemStack stack) {
+        ItemStack singleContainer = stack.copy();
+        singleContainer.setCount(1);
+        IFluidHandlerItem handler = FluidUtil.getFluidHandler(singleContainer);
+        if (handler == null) {
+            return null;
+        }
+
+        int availableSpace = BNCKegFluid.CAPACITY - fluidAmount;
+        FluidStack simulated = availableSpace <= 0 ? null : handler.drain(availableSpace, false);
+        if (simulated == null || simulated.getFluid() == null || simulated.amount <= 0) {
+            return null;
+        }
+        String incomingFluid = BNCFluids.idFor(simulated.getFluid());
+        if (!canAcceptFluid(incomingFluid, simulated.amount)) {
+            return null;
+        }
+
+        FluidStack drained = handler.drain(simulated.amount, true);
+        return drained == null || drained.amount <= 0
+            ? null
+            : new ContainerFluid(incomingFluid, drained.amount, handler.getContainer());
+    }
+
+    private ContainerFluid getGenericContainerExtraction(ItemStack stack) {
+        FluidStack available = BNCFluids.stackFor(fluidId, fluidAmount);
+        if (available == null) {
+            return null;
+        }
+
+        ItemStack singleContainer = stack.copy();
+        singleContainer.setCount(1);
+        IFluidHandlerItem handler = FluidUtil.getFluidHandler(singleContainer);
+        if (handler == null) {
+            return null;
+        }
+
+        int accepted = handler.fill(available, false);
+        if (accepted <= 0) {
+            return null;
+        }
+        FluidStack transfer = available.copy();
+        transfer.amount = accepted;
+        int filled = handler.fill(transfer, true);
+        return filled <= 0 ? null : new ContainerFluid(fluidId, filled, handler.getContainer());
     }
 
     private static ItemStack getDrinkStack(String fluidId) {

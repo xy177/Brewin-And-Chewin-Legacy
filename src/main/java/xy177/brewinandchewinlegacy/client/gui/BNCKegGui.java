@@ -102,7 +102,8 @@ public class BNCKegGui extends GuiContainer {
     }
 
     private String getFluidName() {
-        switch (BNCKegFluid.fromCode(((BNCKegContainer) inventorySlots).getFluidCode())) {
+        String fluidId = BNCFluids.idFromNetworkCode(((BNCKegContainer) inventorySlots).getFluidCode());
+        switch (fluidId) {
             case BNCKegFluid.WATER:
                 return I18n.format("brewinandchewinlegacy.fluid.water");
             case BNCKegFluid.MILK:
@@ -146,7 +147,10 @@ public class BNCKegGui extends GuiContainer {
             case BNCKegFluid.SCARLET_CHEESE:
                 return I18n.format("brewinandchewinlegacy.fluid.scarlet_cheese");
             default:
-                return I18n.format("brewinandchewinlegacy.fluid.empty");
+                FluidStack stack = BNCFluids.stackFor(fluidId, 1);
+                return stack == null
+                    ? I18n.format("brewinandchewinlegacy.fluid.empty")
+                    : stack.getLocalizedName();
         }
     }
 
@@ -156,7 +160,7 @@ public class BNCKegGui extends GuiContainer {
 
     private void drawFluid() {
         int amount = ((BNCKegContainer) inventorySlots).getFluidAmount();
-        String fluidId = BNCKegFluid.fromCode(((BNCKegContainer) inventorySlots).getFluidCode());
+        String fluidId = BNCFluids.idFromNetworkCode(((BNCKegContainer) inventorySlots).getFluidCode());
         FluidStack stack = BNCFluids.stackFor(fluidId, amount);
         if (stack == null) {
             return;

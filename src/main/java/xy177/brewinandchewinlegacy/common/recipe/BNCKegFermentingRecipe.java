@@ -21,30 +21,50 @@ public class BNCKegFermentingRecipe {
     private final int resultFluidAmount;
     private final String baseFluid;
     private final int baseFluidAmount;
+    private final ItemStack pouringContainer;
+    private final ItemStack pouringResult;
+    private final int pouringAmount;
     private final float experience;
     private final int fermentTime;
     private final int temperature;
 
     public BNCKegFermentingRecipe(ResourceLocation id, ItemStack result, int fermentTime, int temperature, String... ingredients) {
-        this(id, result, BNCKegFluid.EMPTY, 0, BNCKegFluid.EMPTY, 0, 1.0F, fermentTime, temperature, ingredients);
+        this(id, result, BNCKegFluid.EMPTY, 0, BNCKegFluid.EMPTY, 0,
+            ItemStack.EMPTY, ItemStack.EMPTY, 0, 1.0F, fermentTime, temperature, ingredients);
     }
 
     public BNCKegFermentingRecipe(ResourceLocation id, ItemStack result, String baseFluid, int baseFluidAmount, float experience, int fermentTime, int temperature, String... ingredients) {
-        this(id, result, BNCKegFluid.EMPTY, 0, baseFluid, baseFluidAmount, experience, fermentTime, temperature, ingredients);
+        this(id, result, BNCKegFluid.EMPTY, 0, baseFluid, baseFluidAmount,
+            ItemStack.EMPTY, ItemStack.EMPTY, 0, experience, fermentTime, temperature, ingredients);
     }
 
     public BNCKegFermentingRecipe(ResourceLocation id, String resultFluid, int resultFluidAmount, String baseFluid, int baseFluidAmount, float experience, int fermentTime, int temperature, String... ingredients) {
-        this(id, ItemStack.EMPTY, resultFluid, resultFluidAmount, baseFluid, baseFluidAmount, experience, fermentTime, temperature, ingredients);
+        this(id, resultFluid, resultFluidAmount, baseFluid, baseFluidAmount,
+            ItemStack.EMPTY, ItemStack.EMPTY, 0, experience, fermentTime, temperature, ingredients);
     }
 
-    private BNCKegFermentingRecipe(ResourceLocation id, ItemStack result, String resultFluid, int resultFluidAmount, String baseFluid, int baseFluidAmount, float experience, int fermentTime, int temperature, String... ingredients) {
+    public BNCKegFermentingRecipe(ResourceLocation id, String resultFluid, int resultFluidAmount,
+                                  String baseFluid, int baseFluidAmount, ItemStack pouringContainer,
+                                  ItemStack pouringResult, int pouringAmount, float experience,
+                                  int fermentTime, int temperature, String... ingredients) {
+        this(id, ItemStack.EMPTY, resultFluid, resultFluidAmount, baseFluid, baseFluidAmount,
+            pouringContainer, pouringResult, pouringAmount, experience, fermentTime, temperature, ingredients);
+    }
+
+    private BNCKegFermentingRecipe(ResourceLocation id, ItemStack result, String resultFluid,
+                                   int resultFluidAmount, String baseFluid, int baseFluidAmount,
+                                   ItemStack pouringContainer, ItemStack pouringResult, int pouringAmount,
+                                   float experience, int fermentTime, int temperature, String... ingredients) {
         this.id = id;
         this.ingredients = Arrays.asList(ingredients);
-        this.result = result;
+        this.result = result == null ? ItemStack.EMPTY : result.copy();
         this.resultFluid = resultFluid == null ? BNCKegFluid.EMPTY : resultFluid;
         this.resultFluidAmount = resultFluidAmount;
         this.baseFluid = baseFluid == null ? BNCKegFluid.EMPTY : baseFluid;
         this.baseFluidAmount = baseFluidAmount;
+        this.pouringContainer = pouringContainer == null ? ItemStack.EMPTY : pouringContainer.copy();
+        this.pouringResult = pouringResult == null ? ItemStack.EMPTY : pouringResult.copy();
+        this.pouringAmount = pouringAmount;
         this.experience = experience;
         this.fermentTime = fermentTime;
         this.temperature = temperature;
@@ -84,6 +104,28 @@ public class BNCKegFermentingRecipe {
 
     public int getBaseFluidAmount() {
         return baseFluidAmount;
+    }
+
+    public boolean hasCustomPouring() {
+        return !pouringContainer.isEmpty() && !pouringResult.isEmpty() && pouringAmount > 0;
+    }
+
+    public ItemStack getPouringContainer() {
+        return pouringContainer.copy();
+    }
+
+    public ItemStack getPouringResult() {
+        return pouringResult.copy();
+    }
+
+    public int getPouringAmount() {
+        return pouringAmount;
+    }
+
+    public boolean matchesPouringContainer(ItemStack stack) {
+        return hasCustomPouring() && stack != null && !stack.isEmpty()
+            && ItemStack.areItemsEqual(pouringContainer, stack)
+            && ItemStack.areItemStackTagsEqual(pouringContainer, stack);
     }
 
     public float getExperience() {
@@ -166,6 +208,14 @@ public class BNCKegFermentingRecipe {
         if (item == null || stack.getItem() != item) {
             return false;
         }
-        return parts.length < 3 || stack.getMetadata() == Integer.parseInt(parts[2]);
+        if (parts.length < 3 || "*".equals(parts[2])) {
+            return true;
+        }
+        try {
+            int metadata = Integer.parseInt(parts[2]);
+            return metadata == OreDictionary.WILDCARD_VALUE || stack.getMetadata() == metadata;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
     }
 }

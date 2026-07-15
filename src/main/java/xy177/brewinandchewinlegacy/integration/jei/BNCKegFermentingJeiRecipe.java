@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 import xy177.brewinandchewinlegacy.BrewinAndChewinLegacy;
@@ -76,6 +77,9 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
         if (recipe.hasItemOutput()) {
             return recipe.getResult();
         }
+        if (recipe.hasCustomPouring()) {
+            return recipe.getPouringResult();
+        }
         if (BNCKegFluid.isDrink(recipe.getResultFluid())) {
             return getDrinkStack(recipe.getResultFluid());
         }
@@ -119,8 +123,15 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
         if (!recipe.hasFluidOutput()) {
             return Collections.emptyList();
         }
+        if (recipe.hasCustomPouring()) {
+            return Collections.singletonList(recipe.getPouringContainer());
+        }
         if (BNCKegFluid.isDrink(recipe.getResultFluid()) && BNCItems.TANKARD != null) {
             return Collections.singletonList(new ItemStack(BNCItems.TANKARD));
+        }
+        if (!BNCKegFluid.FLAXEN_CHEESE.equals(recipe.getResultFluid())
+            && !BNCKegFluid.SCARLET_CHEESE.equals(recipe.getResultFluid())) {
+            return Collections.emptyList();
         }
         Item honeycomb = resolveItem("futuremc:honeycomb");
         if (honeycomb != null) {
@@ -130,7 +141,7 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
     }
 
     public int getPouringAmount() {
-        return recipe.getResultFluidAmount();
+        return recipe.hasCustomPouring() ? recipe.getPouringAmount() : recipe.getResultFluidAmount();
     }
 
     public boolean hasFluidOutput() {
@@ -145,9 +156,20 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
         return recipe.getResultFluidAmount();
     }
 
+    public String getBaseFluidDisplayName() {
+        return getFluidDisplayName(recipe.getBaseFluid());
+    }
+
+    public String getResultFluidDisplayName() {
+        return getFluidDisplayName(recipe.getResultFluid());
+    }
+
     public List<ItemStack> getFluidOutputStacks() {
         if (!recipe.hasFluidOutput()) {
             return Collections.emptyList();
+        }
+        if (recipe.hasCustomPouring()) {
+            return Collections.singletonList(recipe.getPouringResult());
         }
         return getFluidDisplayStacks(recipe.getResultFluid(), recipe.getResultFluidAmount());
     }
@@ -218,7 +240,9 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
         if (parts.length >= 2) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0], parts[1]));
             if (item != null) {
-                int meta = parts.length >= 3 ? Integer.parseInt(parts[2]) : 0;
+                int meta = parts.length >= 3 && "*".equals(parts[2])
+                    ? OreDictionary.WILDCARD_VALUE
+                    : parts.length >= 3 ? Integer.parseInt(parts[2]) : 0;
                 stacks.add(new ItemStack(item, 1, meta));
             }
         }
@@ -270,6 +294,14 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
         }
         if (BNCKegFluid.SCARLET_CHEESE.equals(fluidId) && BNCBlocks.UNRIPE_SCARLET_CHEESE_WHEEL_ITEM != null) {
             return Collections.singletonList(new ItemStack(BNCBlocks.UNRIPE_SCARLET_CHEESE_WHEEL_ITEM, Math.max(1, amount / 1000)));
+        }
+        FluidStack fluid = BNCFluids.stackFor(fluidId, Math.max(1000, amount));
+        if (fluid != null) {
+            ItemStack bucket = FluidUtil.getFilledBucket(fluid);
+            if (!bucket.isEmpty()) {
+                bucket.setCount(Math.max(1, amount / 1000));
+                return Collections.singletonList(bucket);
+            }
         }
         return Collections.emptyList();
     }
@@ -332,6 +364,16 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
             return null;
         }
         return ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0], parts[1]));
+    }
+
+    private static String getFluidDisplayName(String fluidId) {
+        String localKey = "brewinandchewinlegacy.fluid." + fluidId;
+        String localName = I18n.format(localKey);
+        if (!localKey.equals(localName)) {
+            return localName;
+        }
+        FluidStack stack = BNCFluids.stackFor(fluidId, 1);
+        return stack == null ? fluidId : stack.getLocalizedName();
     }
 
     private String getTemperatureKey() {

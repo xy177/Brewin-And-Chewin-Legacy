@@ -129,15 +129,15 @@ public class BNCKegFermentingRecipeCategory implements IRecipeCategory<BNCKegFer
         public void onTooltip(int slotIndex, boolean input, ItemStack ingredient, List<String> tooltip) {
             if (slotIndex == 5 && recipe.hasFluidInput()) {
                 tooltip.add(I18n.format("brewinandchewinlegacy.jei.fermenting.tooltip.fluid_input",
-                    I18n.format("brewinandchewinlegacy.fluid." + recipe.getBaseFluid()),
+                    recipe.getBaseFluidDisplayName(),
                     recipe.getBaseFluidAmount()));
             } else if (slotIndex == 6 && recipe.hasCatalyst()) {
                 tooltip.add(I18n.format("brewinandchewinlegacy.jei.fermenting.tooltip.pouring",
                     recipe.getPouringAmount(),
-                    I18n.format("brewinandchewinlegacy.fluid." + recipe.getResultFluid())));
+                    recipe.getResultFluidDisplayName()));
             } else if (slotIndex == 7 && recipe.hasFluidOutput()) {
                 tooltip.add(I18n.format("brewinandchewinlegacy.jei.fermenting.tooltip.fluid_output",
-                    I18n.format("brewinandchewinlegacy.fluid." + recipe.getResultFluid()),
+                    recipe.getResultFluidDisplayName(),
                     recipe.getResultFluidAmount()));
             }
         }

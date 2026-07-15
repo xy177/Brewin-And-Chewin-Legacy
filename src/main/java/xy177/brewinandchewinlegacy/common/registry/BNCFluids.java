@@ -3,6 +3,7 @@ package xy177.brewinandchewinlegacy.common.registry;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
@@ -81,6 +82,99 @@ public final class BNCFluids {
         return fluid == null || amount <= 0 ? null : new FluidStack(fluid, amount);
     }
 
+    public static String idFor(Fluid fluid) {
+        if (fluid == null) {
+            return BNCKegFluid.EMPTY;
+        }
+        if (fluid == FluidRegistry.WATER) {
+            return BNCKegFluid.WATER;
+        }
+        if (fluid == MILK) {
+            return BNCKegFluid.MILK;
+        }
+        if (fluid == HONEY) {
+            return BNCKegFluid.HONEY;
+        }
+        if (fluid == BEER) {
+            return BNCKegFluid.BEER;
+        }
+        if (fluid == VODKA) {
+            return BNCKegFluid.VODKA;
+        }
+        if (fluid == MEAD) {
+            return BNCKegFluid.MEAD;
+        }
+        if (fluid == RICE_WINE) {
+            return BNCKegFluid.RICE_WINE;
+        }
+        if (fluid == EGG_GROG) {
+            return BNCKegFluid.EGG_GROG;
+        }
+        if (fluid == STRONGROOT_ALE) {
+            return BNCKegFluid.STRONGROOT_ALE;
+        }
+        if (fluid == SACCHARINE_RUM) {
+            return BNCKegFluid.SACCHARINE_RUM;
+        }
+        if (fluid == BLOODY_MARY) {
+            return BNCKegFluid.BLOODY_MARY;
+        }
+        if (fluid == STEEL_TOE_STOUT) {
+            return BNCKegFluid.STEEL_TOE_STOUT;
+        }
+        if (fluid == GLITTERING_GRENADINE) {
+            return BNCKegFluid.GLITTERING_GRENADINE;
+        }
+        if (fluid == PALE_JANE) {
+            return BNCKegFluid.PALE_JANE;
+        }
+        if (fluid == SALTY_FOLLY) {
+            return BNCKegFluid.SALTY_FOLLY;
+        }
+        if (fluid == DREAD_NOG) {
+            return BNCKegFluid.DREAD_NOG;
+        }
+        if (fluid == RED_RUM) {
+            return BNCKegFluid.RED_RUM;
+        }
+        if (fluid == WITHERING_DROSS) {
+            return BNCKegFluid.WITHERING_DROSS;
+        }
+        if (fluid == KOMBUCHA) {
+            return BNCKegFluid.KOMBUCHA;
+        }
+        if (fluid == GREEN_TEA) {
+            return BNCKegFluid.GREEN_TEA;
+        }
+        if (fluid == FLAXEN_CHEESE) {
+            return BNCKegFluid.FLAXEN_CHEESE;
+        }
+        if (fluid == SCARLET_CHEESE) {
+            return BNCKegFluid.SCARLET_CHEESE;
+        }
+        String registeredName = FluidRegistry.getFluidName(fluid);
+        return registeredName == null ? BNCKegFluid.EMPTY : registeredName;
+    }
+
+    public static int networkCodeFor(String fluidId) {
+        Fluid fluid = fluidFor(fluidId);
+        Integer code = fluid == null ? null : FluidRegistry.getRegisteredFluidIDs().get(fluid);
+        return code == null ? 0 : code + 1;
+    }
+
+    public static String idFromNetworkCode(int code) {
+        if (code <= 0) {
+            return BNCKegFluid.EMPTY;
+        }
+        int fluidCode = code - 1;
+        for (Map.Entry<Fluid, Integer> entry : FluidRegistry.getRegisteredFluidIDs().entrySet()) {
+            if (entry.getValue() != null && entry.getValue() == fluidCode) {
+                return idFor(entry.getKey());
+            }
+        }
+        return BNCKegFluid.EMPTY;
+    }
+
     public static Fluid fluidFor(String fluidId) {
         if (BNCKegFluid.WATER.equals(fluidId)) {
             return FluidRegistry.WATER;
@@ -148,7 +242,7 @@ public final class BNCFluids {
         if (BNCKegFluid.SCARLET_CHEESE.equals(fluidId)) {
             return SCARLET_CHEESE;
         }
-        return null;
+        return FluidRegistry.getFluid(fluidId);
     }
 
     public static List<ResourceLocation> spriteLocations() {
