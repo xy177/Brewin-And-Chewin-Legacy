@@ -501,6 +501,7 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
             }
             fluidAmount += fill.amount;
             consumeHeldItem(player, hand, heldStack, fill.remainder);
+            playContainerTransferSound();
             syncToClient();
             return true;
         }
@@ -511,12 +512,17 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
                 fluidAmount -= extract.amount;
                 normalizeFluid();
                 consumeHeldItem(player, hand, heldStack, extract.remainder);
+                playContainerTransferSound();
                 syncToClient();
             }
             return true;
         }
 
         return false;
+    }
+
+    private void playContainerTransferSound() {
+        world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 
     private boolean tryFillFromContainer(ItemStack container) {

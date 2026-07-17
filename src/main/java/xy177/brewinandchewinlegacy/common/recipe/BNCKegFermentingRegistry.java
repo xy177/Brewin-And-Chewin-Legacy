@@ -160,7 +160,7 @@ public final class BNCKegFermentingRegistry {
         registerDefaults();
         if (result == null || result.isEmpty()
             || result.getCount() > Math.min(result.getMaxStackSize(), 64)
-            || !isValidRecipe(experience, fermentTime, temperature, ingredients, true)) {
+            || !isValidRecipe(experience, fermentTime, temperature, ingredients)) {
             return false;
         }
         String normalizedBaseFluid = baseFluid == null ? BNCKegFluid.EMPTY : baseFluid;
@@ -201,7 +201,7 @@ public final class BNCKegFermentingRegistry {
                 || pouringResult.getCount() > Math.min(pouringResult.getMaxStackSize(), 64)
                 || pouringAmount <= 0 || pouringAmount > BNCKegFluid.CAPACITY)
             || !hasPouringContainer && pouringAmount != 0
-            || !isValidRecipe(experience, fermentTime, temperature, ingredients)) {
+            || !isValidRecipe(experience, fermentTime, temperature, ingredients, true)) {
             return false;
         }
 

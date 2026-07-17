@@ -43,7 +43,7 @@ import xy177.brewinandchewinlegacy.common.tile.BNCKegTileEntity;
 public class BrewinAndChewinLegacy {
     public static final String MODID = "brewinandchewinlegacy";
     public static final String NAME = "Brewin' And Chewin' Legacy";
-    public static final String VERSION = "1.1.1";
+    public static final String VERSION = "1.1.2";
     public static final CreativeTabs CREATIVE_TAB = BNCCreativeTab.INSTANCE;
 
     @Mod.Instance(MODID)
