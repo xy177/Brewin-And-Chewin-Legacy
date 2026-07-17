@@ -2,7 +2,6 @@ package xy177.brewinandchewinlegacy.common.tile;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -34,6 +33,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import xy177.brewinandchewinlegacy.common.config.BNCConfig;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFluid;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFermentingRecipe;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFermentingRegistry;
@@ -75,10 +75,10 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
         int cold = 0;
         for (BlockPos checkPos : BlockPos.getAllInBoxMutable(pos.add(-RANGE, -RANGE, -RANGE), pos.add(RANGE, RANGE, RANGE))) {
             IBlockState state = world.getBlockState(checkPos);
-            if (state.getBlock() == BNCBlocks.HEATING_CASK || state.getMaterial() == Material.LAVA || state.getMaterial() == Material.FIRE) {
+            if (BNCConfig.isHeatSource(state)) {
                 heat++;
             }
-            if (state.getBlock() == BNCBlocks.ICE_CRATE || state.getMaterial() == Material.ICE || state.getMaterial() == Material.PACKED_ICE) {
+            if (BNCConfig.isColdSource(state)) {
                 cold++;
             }
         }

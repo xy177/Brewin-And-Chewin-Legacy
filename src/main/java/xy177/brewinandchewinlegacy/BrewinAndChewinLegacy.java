@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.event.RegistryEvent;
 import xy177.brewinandchewinlegacy.common.CommonProxy;
+import xy177.brewinandchewinlegacy.common.config.BNCConfig;
 import xy177.brewinandchewinlegacy.common.gui.BNCGuiHandler;
 import xy177.brewinandchewinlegacy.common.network.BNCNetwork;
 import xy177.brewinandchewinlegacy.common.registry.BNCCreativeTab;
@@ -59,6 +60,7 @@ public class BrewinAndChewinLegacy {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
+        BNCConfig.init(event.getSuggestedConfigurationFile());
         BNCNetwork.init();
         BNCFluids.register();
         GameRegistry.registerTileEntity(BNCKegTileEntity.class, MODID + ":keg");
