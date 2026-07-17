@@ -160,7 +160,7 @@ public final class BNCKegFermentingRegistry {
         registerDefaults();
         if (result == null || result.isEmpty()
             || result.getCount() > Math.min(result.getMaxStackSize(), 64)
-            || !isValidRecipe(experience, fermentTime, temperature, ingredients)) {
+            || !isValidRecipe(experience, fermentTime, temperature, ingredients, true)) {
             return false;
         }
         String normalizedBaseFluid = baseFluid == null ? BNCKegFluid.EMPTY : baseFluid;
@@ -339,8 +339,14 @@ public final class BNCKegFermentingRegistry {
     }
 
     private static boolean isValidRecipe(float experience, int fermentTime, int temperature, String[] ingredients) {
+        return isValidRecipe(experience, fermentTime, temperature, ingredients, false);
+    }
+
+    private static boolean isValidRecipe(float experience, int fermentTime, int temperature,
+                                         String[] ingredients, boolean allowEmpty) {
+        int minimumIngredients = allowEmpty ? 0 : 1;
         if (experience < 0.0F || fermentTime <= 0 || temperature < 1 || temperature > 5
-            || ingredients == null || ingredients.length < 1 || ingredients.length > 4) {
+            || ingredients == null || ingredients.length < minimumIngredients || ingredients.length > 4) {
             return false;
         }
         for (String ingredient : ingredients) {

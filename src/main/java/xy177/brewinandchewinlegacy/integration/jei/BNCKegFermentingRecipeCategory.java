@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fluids.FluidStack;
 import xy177.brewinandchewinlegacy.BrewinAndChewinLegacy;
 import xy177.brewinandchewinlegacy.common.registry.BNCBlocks;
 
@@ -28,7 +27,6 @@ public class BNCKegFermentingRecipeCategory implements IRecipeCategory<BNCKegFer
     private final IDrawableAnimated rightBubble;
     private final IDrawable timeIcon;
     private final IDrawable expIcon;
-    private final IDrawable kegOverlay;
 
     public BNCKegFermentingRecipeCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(BG, 12, 13, 136, 56);
@@ -38,7 +36,6 @@ public class BNCKegFermentingRecipeCategory implements IRecipeCategory<BNCKegFer
         this.rightBubble = helper.createAnimatedDrawable(helper.createDrawable(BG, 180, 75, 9, 24), 50, IDrawableAnimated.StartDirection.BOTTOM, false);
         this.timeIcon = helper.createDrawable(BG, 170, 21, 8, 11);
         this.expIcon = helper.createDrawable(BG, 170, 32, 9, 9);
-        this.kegOverlay = helper.createDrawable(BG, 170, 45, 26, 30);
     }
 
     @Override
@@ -78,11 +75,7 @@ public class BNCKegFermentingRecipeCategory implements IRecipeCategory<BNCKegFer
         recipeLayout.getItemStacks().init(4, false, 104, 38);
         recipeLayout.getItemStacks().set(4, recipeWrapper.getOutput());
 
-        FluidStack inputFluid = recipeWrapper.getInputFluidStack();
-        if (inputFluid != null) {
-            recipeLayout.getFluidStacks().init(0, true, 0, 2, 26, 30, 1000, false, kegOverlay);
-            recipeLayout.getFluidStacks().set(0, inputFluid);
-
+        if (recipeWrapper.hasFluidInput()) {
             recipeLayout.getItemStacks().init(5, true, 4, 4);
             recipeLayout.getItemStacks().set(5, recipeWrapper.getFluidInputStacks());
         }
@@ -92,11 +85,7 @@ public class BNCKegFermentingRecipeCategory implements IRecipeCategory<BNCKegFer
             recipeLayout.getItemStacks().set(6, recipeWrapper.getCatalystStacks());
         }
 
-        FluidStack outputFluid = recipeWrapper.getOutputFluidStack();
-        if (outputFluid != null) {
-            recipeLayout.getFluidStacks().init(1, false, 100, 2, 26, 30, 1000, false, kegOverlay);
-            recipeLayout.getFluidStacks().set(1, outputFluid);
-
+        if (recipeWrapper.hasFluidOutput()) {
             recipeLayout.getItemStacks().init(7, false, 104, 4);
             recipeLayout.getItemStacks().set(7, recipeWrapper.getFluidOutputStacks());
         }

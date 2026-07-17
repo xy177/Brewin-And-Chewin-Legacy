@@ -26,6 +26,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.FluidTankProperties;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -50,6 +52,7 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
     private String fluidId = BNCKegFluid.EMPTY;
     private int fluidAmount;
     private String lastRecipeId = "";
+    private boolean fermenting;
 
     @Override
     public void update() {
@@ -352,6 +355,8 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
                 return fluidAmount;
             case 4:
                 return BNCFluids.networkCodeFor(fluidId);
+            case 5:
+                return fermenting ? 1 : 0;
             default:
                 return 0;
         }
@@ -378,6 +383,9 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
             case 4:
                 fluidId = BNCFluids.idFromNetworkCode(value);
                 break;
+            case 5:
+                fermenting = value != 0;
+                break;
             default:
                 break;
         }
@@ -385,7 +393,7 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
 
     @Override
     public int getFieldCount() {
-        return 5;
+        return 6;
     }
 
     @Override
@@ -395,6 +403,7 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
     }
 
     private void updateFermenting() {
+        fermenting = false;
         BNCKegFermentingRecipe recipe = BNCKegFermentingRegistry.findMatch(getInputStacks(), fluidId, fluidAmount);
         if (recipe == null || !recipe.canOutputTo(inventory.get(5))) {
             coolDownProgress();
@@ -413,6 +422,7 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
             return;
         }
 
+        fermenting = true;
         fermentTime++;
         if (fermentTime >= fermentTimeTotal) {
             finishRecipe(recipe);
@@ -430,6 +440,7 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
     }
 
     private void finishRecipe(BNCKegFermentingRecipe recipe) {
+        fermenting = false;
         if (recipe.hasFluidOutput()) {
             fluidId = recipe.getResultFluid();
             fluidAmount = recipe.getResultFluidAmount();
@@ -605,7 +616,39 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
                 return new ContainerFluid(BNCKegFluid.GREEN_TEA, 250, new ItemStack(cup, 1, stack.getMetadata()));
             }
         }
+        String drinkFluid = getDrinkFluid(stack);
+        if (!drinkFluid.isEmpty()) {
+            return new ContainerFluid(drinkFluid, 250, new ItemStack(BNCItems.TANKARD));
+        }
+        ContainerFluid ceramicsFill = getCeramicsContainerFill(stack);
+        if (ceramicsFill != null) {
+            return ceramicsFill;
+        }
         return getGenericContainerFill(stack);
+    }
+
+    private ContainerFluid getCeramicsContainerFill(ItemStack stack) {
+        Item ceramicsBucket = ForgeRegistries.ITEMS.getValue(new ResourceLocation("ceramics:clay_bucket"));
+        if (ceramicsBucket == null || stack == null || stack.isEmpty() || stack.getItem() != ceramicsBucket
+            || !stack.hasTagCompound()) {
+            return null;
+        }
+
+        NBTTagCompound root = stack.getTagCompound();
+        NBTTagCompound fluidTag = root.hasKey("fluids", 10)
+            ? root.getCompoundTag("fluids")
+            : root.hasKey("Fluid", 10) ? root.getCompoundTag("Fluid") : null;
+        if (fluidTag == null) {
+            return null;
+        }
+
+        String fluidName = fluidTag.getString("FluidName");
+        int amount = fluidTag.getInteger("Amount");
+        Fluid fluid = FluidRegistry.getFluid(fluidName);
+        if (fluid == null || amount < 1000) {
+            return null;
+        }
+        return new ContainerFluid(BNCFluids.idFor(fluid), 1000, new ItemStack(ceramicsBucket));
     }
 
     private ContainerFluid getContainerExtraction(ItemStack stack) {
@@ -750,6 +793,61 @@ public class BNCKegTileEntity extends TileEntity implements IInventory, net.mine
             return new ItemStack(BNCItems.KOMBUCHA);
         }
         return ItemStack.EMPTY;
+    }
+
+    private static String getDrinkFluid(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return BNCKegFluid.EMPTY;
+        }
+        if (BNCItems.BEER != null && stack.getItem() == BNCItems.BEER) {
+            return BNCKegFluid.BEER;
+        }
+        if (BNCItems.VODKA != null && stack.getItem() == BNCItems.VODKA) {
+            return BNCKegFluid.VODKA;
+        }
+        if (BNCItems.MEAD != null && stack.getItem() == BNCItems.MEAD) {
+            return BNCKegFluid.MEAD;
+        }
+        if (BNCItems.RICE_WINE != null && stack.getItem() == BNCItems.RICE_WINE) {
+            return BNCKegFluid.RICE_WINE;
+        }
+        if (BNCItems.EGG_GROG != null && stack.getItem() == BNCItems.EGG_GROG) {
+            return BNCKegFluid.EGG_GROG;
+        }
+        if (BNCItems.STRONGROOT_ALE != null && stack.getItem() == BNCItems.STRONGROOT_ALE) {
+            return BNCKegFluid.STRONGROOT_ALE;
+        }
+        if (BNCItems.SACCHARINE_RUM != null && stack.getItem() == BNCItems.SACCHARINE_RUM) {
+            return BNCKegFluid.SACCHARINE_RUM;
+        }
+        if (BNCItems.BLOODY_MARY != null && stack.getItem() == BNCItems.BLOODY_MARY) {
+            return BNCKegFluid.BLOODY_MARY;
+        }
+        if (BNCItems.STEEL_TOE_STOUT != null && stack.getItem() == BNCItems.STEEL_TOE_STOUT) {
+            return BNCKegFluid.STEEL_TOE_STOUT;
+        }
+        if (BNCItems.GLITTERING_GRENADINE != null && stack.getItem() == BNCItems.GLITTERING_GRENADINE) {
+            return BNCKegFluid.GLITTERING_GRENADINE;
+        }
+        if (BNCItems.PALE_JANE != null && stack.getItem() == BNCItems.PALE_JANE) {
+            return BNCKegFluid.PALE_JANE;
+        }
+        if (BNCItems.SALTY_FOLLY != null && stack.getItem() == BNCItems.SALTY_FOLLY) {
+            return BNCKegFluid.SALTY_FOLLY;
+        }
+        if (BNCItems.DREAD_NOG != null && stack.getItem() == BNCItems.DREAD_NOG) {
+            return BNCKegFluid.DREAD_NOG;
+        }
+        if (BNCItems.RED_RUM != null && stack.getItem() == BNCItems.RED_RUM) {
+            return BNCKegFluid.RED_RUM;
+        }
+        if (BNCItems.WITHERING_DROSS != null && stack.getItem() == BNCItems.WITHERING_DROSS) {
+            return BNCKegFluid.WITHERING_DROSS;
+        }
+        if (BNCItems.KOMBUCHA != null && stack.getItem() == BNCItems.KOMBUCHA) {
+            return BNCKegFluid.KOMBUCHA;
+        }
+        return BNCKegFluid.EMPTY;
     }
 
     private void consumeHeldItem(EntityPlayer player, EnumHand hand, ItemStack heldStack, ItemStack remainder) {

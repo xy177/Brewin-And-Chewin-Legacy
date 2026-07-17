@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import xy177.brewinandchewinlegacy.BrewinAndChewinLegacy;
+import xy177.brewinandchewinlegacy.client.render.BNCFluidRenderer;
 import xy177.brewinandchewinlegacy.common.gui.BNCKegContainer;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFluid;
 import xy177.brewinandchewinlegacy.common.registry.BNCFluids;
@@ -61,7 +59,16 @@ public class BNCKegGui extends GuiContainer {
         int progress = ((BNCKegContainer) inventorySlots).getFermentProgressScaled();
         drawTexturedModalRect(guiLeft + 80, guiTop + 25, 176, 4, progress + 1, 18);
 
-        int temperature = ((BNCKegContainer) inventorySlots).getKegTemperature();
+        BNCKegContainer container = (BNCKegContainer) inventorySlots;
+        if (container.isFermenting()) {
+            int bubbleHeight = (int) (container.getFermentTime() / 80.0F * 24.0F) % 25;
+            drawTexturedModalRect(guiLeft + 109, guiTop + 44 - bubbleHeight,
+                176, 79 - bubbleHeight, 9, bubbleHeight + 1);
+            drawTexturedModalRect(guiLeft + 147, guiTop + 44 - bubbleHeight,
+                186, 79 - bubbleHeight, 9, bubbleHeight + 1);
+        }
+
+        int temperature = container.getKegTemperature();
         if (temperature == 1) {
             drawTexturedModalRect(guiLeft + 35, guiTop + 55, 176, 0, 8, 4);
         }
@@ -170,28 +177,6 @@ public class BNCKegGui extends GuiContainer {
         int height = Math.max(1, Math.min(31, amount * 31 / BNCKegFluid.CAPACITY));
         int x = guiLeft + 120;
         int y = guiTop + 16 + (31 - height);
-        drawFluidStack(stack, x, y, width, height);
-    }
-
-    private void drawFluidStack(FluidStack stack, int x, int y, int width, int height) {
-        TextureAtlasSprite sprite = mc.getTextureMapBlocks().getAtlasSprite(stack.getFluid().getStill(stack).toString());
-        int color = stack.getFluid().getColor(stack);
-        float alpha = ((color >> 24) & 255) / 255.0F;
-        if (alpha <= 0.0F) {
-            alpha = 1.0F;
-        }
-        GlStateManager.color(
-            ((color >> 16) & 255) / 255.0F,
-            ((color >> 8) & 255) / 255.0F,
-            (color & 255) / 255.0F,
-            alpha
-        );
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        for (int drawX = 0; drawX < width; drawX += 16) {
-            for (int drawY = 0; drawY < height; drawY += 16) {
-                drawTexturedModalRect(x + drawX, y + drawY, sprite, Math.min(16, width - drawX), Math.min(16, height - drawY));
-            }
-        }
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        BNCFluidRenderer.draw(mc, stack, x, y, width, height);
     }
 }

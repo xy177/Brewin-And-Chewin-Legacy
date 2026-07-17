@@ -21,6 +21,7 @@ public class BNCKegContainer extends Container {
     private int lastTemperature;
     private int lastFluidAmount;
     private int lastFluidCode;
+    private int lastFermenting;
 
     public BNCKegContainer(InventoryPlayer playerInventory, BNCKegTileEntity keg) {
         this.keg = keg;
@@ -73,6 +74,9 @@ public class BNCKegContainer extends Container {
             if (lastFluidCode != keg.getField(4)) {
                 listener.sendWindowProperty(this, 4, keg.getField(4));
             }
+            if (lastFermenting != keg.getField(5)) {
+                listener.sendWindowProperty(this, 5, keg.getField(5));
+            }
         }
 
         lastFermentTime = keg.getField(0);
@@ -80,6 +84,7 @@ public class BNCKegContainer extends Container {
         lastTemperature = keg.getField(2);
         lastFluidAmount = keg.getField(3);
         lastFluidCode = keg.getField(4);
+        lastFermenting = keg.getField(5);
     }
 
     @SideOnly(Side.CLIENT)
@@ -141,6 +146,14 @@ public class BNCKegContainer extends Container {
 
     public int getFluidCode() {
         return keg.getField(4);
+    }
+
+    public int getFermentTime() {
+        return keg.getField(0);
+    }
+
+    public boolean isFermenting() {
+        return keg.getField(5) != 0;
     }
 
     private static class OutputSlot extends Slot {

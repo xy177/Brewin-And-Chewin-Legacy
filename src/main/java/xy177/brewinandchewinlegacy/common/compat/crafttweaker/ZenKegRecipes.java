@@ -95,7 +95,7 @@ public final class ZenKegRecipes {
                                                               IItemStack pouringContainer, IItemStack pouringResult,
                                                               int pouringAmount, int fermentTime, int temperature,
                                                               float experience) {
-        String[] ingredientTokens = toIngredientTokens(ingredients);
+        String[] ingredientTokens = toIngredientTokens(ingredients, true);
         FluidStack resultFluid = toFluidStack(outputFluid);
         FluidStack baseFluid = toFluidStack(inputFluid);
         ItemStack container = pouringContainer == null
@@ -142,7 +142,7 @@ public final class ZenKegRecipes {
     public static boolean addFluidRecipeAdvanced(String name, IIngredient[] ingredients, ILiquidStack outputFluid,
                                                  ILiquidStack inputFluid, int fermentTime, int temperature,
                                                  float experience) {
-        String[] ingredientTokens = toIngredientTokens(ingredients);
+        String[] ingredientTokens = toIngredientTokens(ingredients, true);
         FluidStack resultFluid = toFluidStack(outputFluid);
         FluidStack baseFluid = toFluidStack(inputFluid);
         if (ingredientTokens == null || resultFluid == null
@@ -192,8 +192,15 @@ public final class ZenKegRecipes {
     }
 
     private static String[] toIngredientTokens(IIngredient[] ingredients) {
-        if (ingredients == null || ingredients.length < 1 || ingredients.length > 4) {
-            CraftTweakerAPI.logError("Keg recipes require between 1 and 4 item ingredients");
+        return toIngredientTokens(ingredients, false);
+    }
+
+    private static String[] toIngredientTokens(IIngredient[] ingredients, boolean allowEmpty) {
+        int minimum = allowEmpty ? 0 : 1;
+        if (ingredients == null || ingredients.length < minimum || ingredients.length > 4) {
+            CraftTweakerAPI.logError(allowEmpty
+                ? "Fluid-output keg recipes require between 0 and 4 item ingredients"
+                : "Item-output keg recipes require between 1 and 4 item ingredients");
             return null;
         }
 

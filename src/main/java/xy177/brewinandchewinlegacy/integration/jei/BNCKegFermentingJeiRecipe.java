@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 import xy177.brewinandchewinlegacy.BrewinAndChewinLegacy;
+import xy177.brewinandchewinlegacy.client.render.BNCFluidRenderer;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFermentingRecipe;
 import xy177.brewinandchewinlegacy.common.recipe.BNCKegFluid;
 import xy177.brewinandchewinlegacy.common.registry.BNCBlocks;
@@ -192,6 +193,19 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
 
     @Override
     public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
+        FluidStack inputFluid = getInputFluidStack();
+        if (inputFluid != null) {
+            BNCFluidRenderer.drawTank(minecraft, inputFluid, 0, 2, 26, 30, 1000);
+            minecraft.getTextureManager().bindTexture(BG);
+            Gui.drawModalRectWithCustomSizedTexture(0, 2, 170, 45, 26, 30, 256, 256);
+        }
+        FluidStack outputFluid = getOutputFluidStack();
+        if (outputFluid != null) {
+            BNCFluidRenderer.drawTank(minecraft, outputFluid, 100, 2, 26, 30, 1000);
+            minecraft.getTextureManager().bindTexture(BG);
+            Gui.drawModalRectWithCustomSizedTexture(100, 2, 170, 45, 26, 30, 256, 256);
+        }
+
         minecraft.getTextureManager().bindTexture(BG);
         int temperature = getTemperature();
         if (temperature <= 2) {
@@ -211,7 +225,13 @@ public class BNCKegFermentingJeiRecipe implements IRecipeWrapper {
     @Override
     public List<String> getTooltipStrings(int mouseX, int mouseY) {
         List<String> tooltip = new ArrayList<>();
-        if (isInside(mouseX, mouseY, 67, 2, 22, 28)) {
+        if (hasFluidInput() && isInside(mouseX, mouseY, 0, 2, 26, 30)) {
+            tooltip.add(I18n.format("brewinandchewinlegacy.jei.fermenting.tooltip.fluid_input",
+                getBaseFluidDisplayName(), getBaseFluidAmount()));
+        } else if (hasFluidOutput() && isInside(mouseX, mouseY, 100, 2, 26, 30)) {
+            tooltip.add(I18n.format("brewinandchewinlegacy.jei.fermenting.tooltip.fluid_output",
+                getResultFluidDisplayName(), getResultFluidAmount()));
+        } else if (isInside(mouseX, mouseY, 67, 2, 22, 28)) {
             int fermentTime = getFermentTime();
             if (fermentTime >= 1200) {
                 tooltip.add(I18n.format("brewinandchewinlegacy.jei.fermenting.tooltip.time", fermentTime / 1200));
